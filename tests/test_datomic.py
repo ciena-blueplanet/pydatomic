@@ -43,7 +43,7 @@ class DatomicTest(unittest.TestCase):
             ':tempids {-9223350046623220292 17592186045417}}'
         ))
         self.assertEqual(
-            db.transact('[{:db/id #db/id[:db.part/user] :person/name "Peter"}]'), {
+            db.transact(['{:db/id #db/id[:db.part/user] :person/name "Peter"}']), {
                 ':db-after': {':db/alias': 'dev/scratch', ':basis-t': 1000},
                 ':tempids': {-9223350046623220292: 17592186045417},
                 ':db-before': {':db/alias': 'dev/scratch', ':basis-t': 63},
@@ -59,13 +59,7 @@ class DatomicTest(unittest.TestCase):
             self.requests.post.mock_calls, [call(
                 'http://localhost:3000/data/tdb/db/',
                 headers={'Accept': 'application/edn'},
-                data={
-                    'tx-data': (
-                        '[[\n{\n:\nd\nb\n/\ni\nd\n \n#\nd\nb\n/\ni\nd\n[\n:\nd\nb\n.\np\na\nr\n'
-                        't\n/\nu\ns\ne\nr\n]\n \n:\np\ne\nr\ns\no\nn\n/\nn\na\nm\ne\n \n"\nP\n'
-                        'e\nt\ne\nr\n"\n}\n]\n]'
-                    )
-                }
+                data={'tx-data': '[{:db/id #db/id[:db.part/user] :person/name "Peter"}\n]'}
             )]
         )
 
