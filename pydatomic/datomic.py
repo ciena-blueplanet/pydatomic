@@ -51,7 +51,29 @@ class Datomic(object):
         assert r.status_code == 200
         return loads(r.content)
 
-if __name__ == '__main__':
+    def datoms(self, dbname, basis_t='-', index='eavt', **kwargs):
+        '''Returns a set or range of datoms from an index'''
+        options = {
+            'e': 'e', 'a': 'a', 'v': 'v',
+            'start': 'start', 'end': 'end', 'offset': 'offset', 'limit': 'limit',
+            'as_of_t': 'as-of', 'since_t': 'since', 'history': 'history',
+        }
+
+        get_args = {'index': index}
+        for k, v in kwargs.iteritems():
+            if k not in options:
+                raise ValueError("Unknown option '{}'".format(k))
+
+            get_args[options[k]] = v
+
+        url = '{}/{}/datoms'.format(self.db_url(dbname), basis_t)
+        r = requests.get(url, params=get_args, headers={'Accept':'application/edn'})
+
+        assert r.status_code == 200
+        return loads(r.content)
+
+
+if __name__ == '__main__':      # pragma: nocover
     q = """[{
   :db/id #db/id[:db.part/db]
   :db/ident :person/name

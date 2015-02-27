@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 import unittest
 from datetime import datetime
 from mock import Mock, call, patch
@@ -76,6 +77,20 @@ class DatomicTest(unittest.TestCase):
                 params={'q': '[:find ?e ?n :where [?e :person/name ?n]]', 'args': '[{:db/alias tdb/db} ]'}
             )
         ])
+
+    def test_datoms(self):
+        '''Verify datoms()'''
+        conn = Datomic('http://localhost:3000/', 'tdb')
+        db = Database('db', conn)
+
+        self.requests.get.return_value = Mock(status_code=200, content=json.dumps([{':tx': 1, ':e': 1}]))
+        value = db.datoms(basis_t=12345, index='avet', e=123, history=True)
+        self.assertEqual(value, ({u':e': u':', u':': 1, 1: u':tx'}, ))
+        self.requests.get.assert_called_once_with(
+            'http://localhost:3000/data/tdb/db/12345/datoms',
+            headers={'Accept': 'application/edn'},
+            params={'index': 'avet', 'e': 123, 'history': True}
+        )
 
 
 if __name__ == "__main__":
